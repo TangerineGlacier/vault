@@ -1,0 +1,2 @@
+This is an insane encryption file to encrypt your password.
+If you have decrypted this good job! 
