@@ -3,22 +3,44 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 	"syscall"
+	"github.com/atotto/clipboard"
 	"github.com/sreevatsan/tangerine-vault/crypto"
 	"github.com/spf13/cobra"
 	"golang.org/x/term"
 )
 
-
+// getPassword reads a password from stdin without displaying it
 func getPassword(prompt string) (string, error) {
 	fmt.Print(prompt)
 	bytePassword, err := term.ReadPassword(int(syscall.Stdin))
-	fmt.Println() 
+	fmt.Println() // Add a newline after password input
 	if err != nil {
 		return "", err
 	}
 	return string(bytePassword), nil
+}
+
+// getConfirmation prompts for yes/no confirmation
+func getConfirmation(prompt string) bool {
+	reader := bufio.NewReader(os.Stdin)
+	for {
+		fmt.Printf("%s (y/n): ", prompt)
+		response, err := reader.ReadString('\n')
+		if err != nil {
+			return false
+		}
+		response = strings.ToLower(strings.TrimSpace(response))
+		if response == "y" || response == "yes" {
+			return true
+		}
+		if response == "n" || response == "no" {
+			return false
+		}
+		fmt.Println("Please enter 'y' or 'n'")
+	}
 }
 
 var rootCmd = &cobra.Command{
@@ -38,12 +60,29 @@ var encryptCmd = &cobra.Command{
 		var err error
 
 		if inputFile != "" {
+			// Read content from file
 			fileContent, err := os.ReadFile(inputFile)
 			if err != nil {
 				return fmt.Errorf("failed to read input file: %v", err)
 			}
 			content = string(fileContent)
+
+			// Check if file is already encrypted
+			if strings.HasSuffix(inputFile, ".txt") {
+				outputPath := filepath.Join(dir, name+".txt")
+				if _, err := os.Stat(outputPath); err == nil {
+					if !getConfirmation(fmt.Sprintf("Warning: %s already exists. Are you sure you want to overwrite it?", outputPath)) {
+						return fmt.Errorf("operation cancelled by user")
+					}
+				}
+			}
+
+			// Confirm encryption
+			if !getConfirmation(fmt.Sprintf("Are you sure you want to encrypt %s?", inputFile)) {
+				return fmt.Errorf("operation cancelled by user")
+			}
 		} else {
+			// Read content from stdin
 			fmt.Print("Enter content to encrypt: ")
 			reader := bufio.NewReader(os.Stdin)
 			content, err = reader.ReadString('\n')
@@ -51,12 +90,19 @@ var encryptCmd = &cobra.Command{
 				return err
 			}
 			content = strings.TrimSpace(content)
+
+			// Confirm encryption
+			if !getConfirmation("Are you sure you want to encrypt this content?") {
+				return fmt.Errorf("operation cancelled by user")
+			}
 		}
 
 		password, err := getPassword("Enter password: ")
 		if err != nil {
 			return err
 		}
+
+		// Confirm password
 		confirmPassword, err := getPassword("Confirm password: ")
 		if err != nil {
 			return err
@@ -95,6 +141,13 @@ var decryptCmd = &cobra.Command{
 			if err == nil {
 				fmt.Println("Decrypted content:")
 				fmt.Println(decrypted)
+				
+				// Copy to clipboard
+				if err := clipboard.WriteAll(decrypted); err != nil {
+					fmt.Println("Warning: Could not copy to clipboard:", err)
+				} else {
+					fmt.Println("\nContent has been copied to your clipboard!")
+				}
 				return nil
 			}
 
