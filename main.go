@@ -1,22 +1,20 @@
 package main
-
 import (
 	"bufio"
 	"fmt"
 	"os"
 	"strings"
 	"syscall"
-
 	"github.com/sreevatsan/tangerine-vault/crypto"
 	"github.com/spf13/cobra"
 	"golang.org/x/term"
 )
 
-// getPassword reads a password from stdin without displaying it
+
 func getPassword(prompt string) (string, error) {
 	fmt.Print(prompt)
 	bytePassword, err := term.ReadPassword(int(syscall.Stdin))
-	fmt.Println() // Add a newline after password input
+	fmt.Println() 
 	if err != nil {
 		return "", err
 	}
@@ -40,14 +38,12 @@ var encryptCmd = &cobra.Command{
 		var err error
 
 		if inputFile != "" {
-			// Read content from file
 			fileContent, err := os.ReadFile(inputFile)
 			if err != nil {
 				return fmt.Errorf("failed to read input file: %v", err)
 			}
 			content = string(fileContent)
 		} else {
-			// Read content from stdin
 			fmt.Print("Enter content to encrypt: ")
 			reader := bufio.NewReader(os.Stdin)
 			content, err = reader.ReadString('\n')
@@ -61,8 +57,6 @@ var encryptCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-
-		// Confirm password
 		confirmPassword, err := getPassword("Confirm password: ")
 		if err != nil {
 			return err

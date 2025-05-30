@@ -10,57 +10,44 @@ import (
 	"path/filepath"
 )
 
-// EncryptFile encrypts the content using AES-256-GCM and saves it to a file
 func EncryptFile(content string, password string, outputDir string, fileName string) error {
-	// Create output directory if it doesn't exist
 	if err := os.MkdirAll(outputDir, 0755); err != nil {
 		return err
 	}
 
-	// Generate a random salt
 	salt := make([]byte, 16)
 	if _, err := rand.Read(salt); err != nil {
 		return err
 	}
 
-	// Derive key from password
 	key := deriveKey(password, salt)
 
-	// Create cipher block
 	block, err := aes.NewCipher(key)
 	if err != nil {
 		return err
 	}
 
-	// Create GCM mode
 	gcm, err := cipher.NewGCM(block)
 	if err != nil {
 		return err
 	}
 
-	// Create nonce
 	nonce := make([]byte, gcm.NonceSize())
 	if _, err := rand.Read(nonce); err != nil {
 		return err
 	}
 
-	// Encrypt the content
 	ciphertext := gcm.Seal(nonce, nonce, []byte(content), nil)
 
-	// Combine salt and ciphertext
 	finalData := append(salt, ciphertext...)
 
-	// Encode to base64
 	encodedData := base64.StdEncoding.EncodeToString(finalData)
 
-	// Write to file
 	outputPath := filepath.Join(outputDir, fileName+".txt")
 	return os.WriteFile(outputPath, []byte(encodedData), 0644)
 }
 
-// DecryptFile decrypts the content from a file using AES-256-GCM
 func DecryptFile(filePath string, password string) (string, error) {
-	// Read the encrypted file
 	encodedData, err := os.ReadFile(filePath)
 	if err != nil {
 		return "", err

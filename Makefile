@@ -10,4 +10,4 @@ install: build
 	sudo mv $(BINARY_NAME) $(INSTALL_DIR)/$(BINARY_NAME)
 
 clean:
-	rm -f $(BINARY_NAME) 
+	rm -f $(BINARY_NAME)  
