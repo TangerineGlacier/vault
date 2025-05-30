@@ -5,14 +5,17 @@ A secure CLI tool for storing and managing your passkeys and sensitive credentia
 
 ## Problem
 
-For a long time, I had been storing sensitive information—like passkeys, GitHub Actions secrets, passwords, and recovery keys—in a single Obsidian note titled “Keys.” Needless to say, this wasn’t exactly a secure solution.
+For a long time, I had been storing sensitive information—like passkeys, GitHub Actions secrets, passwords, and recovery keys—in a single Obsidian note titled "Keys." Needless to say, this wasn't exactly a secure solution.
 
 ## Solution
 
-There are robust tools out there—like Ansible Vault or HashiCorp Vault—that could’ve solved this. But I didn’t want the overhead of setting up and learning a new system just to securely encrypt and decrypt a simple file. I needed something fast, lightweight, and seamless to integrate into my workflow.
+There are robust tools out there—like Ansible Vault or HashiCorp Vault—that could've solved this. But I didn't want the overhead of setting up and learning a new system just to securely encrypt and decrypt a simple file. I needed something fast, lightweight, and seamless to integrate into my workflow.
 
-So I built a CLI tool to do exactly that. It’s written in Go, because I love Go, and it gets the job done—securely and efficiently—without getting in the way.
+So I built a CLI tool to do exactly that. It's written in Go, because I love Go, and it gets the job done—securely and efficiently—without getting in the way.
 
+## Demo
+
+![Tangerine Vault Demo](assets/demo.gif)
 
 ## Installation
 
@@ -47,6 +50,7 @@ tangerine-vault decrypt /path/to/encrypted/file.txt
 This will:
 1. Prompt you for the password
 2. Display the decrypted content
+3. Automatically copy the decrypted content to your clipboard
 
 ## Security Notes
 
