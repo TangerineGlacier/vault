@@ -9,7 +9,7 @@ For a long time, I had been storing sensitive information—like passkeys, GitHu
 
 ## Solution
 
-There are robust tools out there—like Ansible Vault or HashiCorp Vault—that could've solved this. But I didn't want the overhead of setting up and learning a new system just to securely encrypt and decrypt a simple file. I needed something fast, lightweight, and seamless to integrate into my workflow.
+There are robust tools out there—like Ansible Vault or HashiCorp Vault—that could've solved this. But I didn't want the overhead of setting up and learning a new system just to securely encrypt and decrypt a simple file. I needed something fast, lightweight, and seamless to integrate into my workflow within my terminal.
 
 So I built a CLI tool to do exactly that. It's written in Go, because I love Go, and it gets the job done—securely and efficiently—without getting in the way.
 
@@ -33,13 +33,18 @@ make install
 ### Encrypt Content
 
 ```bash
-tangerine-vault encrypt --dir /path/to/directory --name mysecret
+# Encrypt a file
+tangerine-vault encrypt --file /path/to/your/file.txt --name mysecret
+
+# Or encrypt content directly
+tangerine-vault encrypt --name mysecret
 ```
 
 This will:
-1. Prompt you to enter the content you want to encrypt
-2. Ask for a password
-3. Save the encrypted content to `/path/to/directory/mysecret.txt`
+1. If using `--file`: Read content from the specified file
+2. If no `--file`: Prompt you to enter the content you want to encrypt
+3. Ask for a password
+4. Save the encrypted content to `mysecret.txt`
 
 ### Decrypt Content
 
